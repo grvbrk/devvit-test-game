@@ -5,11 +5,14 @@ import './index.css';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import { PageContextProvider } from './hooks/usePage';
+import GameSettingsProvider from './hooks/useGameConfig';
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
-    <PageContextProvider>
+  <PageContextProvider>
+    <GameSettingsProvider>
       <App />
-    </PageContextProvider>
+    </GameSettingsProvider>
+  </PageContextProvider>
   // </StrictMode>
 );

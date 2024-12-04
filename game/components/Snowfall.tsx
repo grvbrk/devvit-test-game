@@ -9,7 +9,7 @@ interface ParticleAttributes {
   velocity: number;
   shadowColor: string;
   shadowBlur: number;
-  letter: string
+  letter: string;
   update: () => void;
   draw: () => void;
 }
@@ -22,7 +22,7 @@ export default function Snowfall() {
       const canvas = canvasRef.current;
       const c = canvas.getContext('2d');
 
-      canvas.width = innerWidth
+      canvas.width = innerWidth;
       canvas.height = innerHeight;
 
       // Variables
@@ -32,11 +32,59 @@ export default function Snowfall() {
         fallingSpeed: 0.004, // Intensity of the snowfall horizontal
         colors: ['#ccc', '#eee', '#fff', '#ddd'], // Array of usable colors
         letters: [
-          'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-          'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-          'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-          'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-        ] // Array of uppercase and lowercase letters
+          'A',
+          'B',
+          'C',
+          'D',
+          'E',
+          'F',
+          'G',
+          'H',
+          'I',
+          'J',
+          'K',
+          'L',
+          'M',
+          'N',
+          'O',
+          'P',
+          'Q',
+          'R',
+          'S',
+          'T',
+          'U',
+          'V',
+          'W',
+          'X',
+          'Y',
+          'Z',
+          'a',
+          'b',
+          'c',
+          'd',
+          'e',
+          'f',
+          'g',
+          'h',
+          'i',
+          'j',
+          'k',
+          'l',
+          'm',
+          'n',
+          'o',
+          'p',
+          'q',
+          'r',
+          's',
+          't',
+          'u',
+          'v',
+          'w',
+          'x',
+          'y',
+          'z',
+        ], // Array of uppercase and lowercase letters
       };
 
       const mouse = {
@@ -49,8 +97,6 @@ export default function Snowfall() {
         mouse.x = event.clientX;
         mouse.y = event.clientY;
       });
-
-
 
       addEventListener('resize', () => {
         canvas.width = innerWidth;
@@ -69,8 +115,7 @@ export default function Snowfall() {
 
       const randomLetter = (letters: string[]) => {
         return letters[Math.floor(Math.random() * letters.length)];
-      }
-
+      };
 
       const distance = (x1: number, y1: number, x2: number, y2: number) => {
         const xDist = x2 - x1;
@@ -78,7 +123,6 @@ export default function Snowfall() {
 
         return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
       };
-
 
       // Objects
       // eslint-disable-next-line no-inner-declarations
@@ -98,10 +142,9 @@ export default function Snowfall() {
         this.color = color;
         this.radians = radians;
         this.velocity = velocity;
-        this.letter = letter
+        this.letter = letter;
         this.shadowColor = 'transparent';
         this.shadowBlur = 0;
-
 
         this.update = () => {
           // Move these points over time
@@ -113,7 +156,7 @@ export default function Snowfall() {
             this.color = '#fc6';
             this.shadowColor = '#fc6';
             this.shadowBlur = 10;
-            this.velocity = velocity - 0.002
+            this.velocity = velocity - 0.002;
             // make it move away from the mouse
             // this.x += (this.x - mouse.x) * 0.06
             // this.y += (this.y - mouse.y) * 0.01
@@ -121,7 +164,7 @@ export default function Snowfall() {
             this.color = color;
             this.shadowColor = 'transparent';
             this.shadowBlur = 0;
-            this.velocity = velocity - 0.001
+            this.velocity = velocity - 0.001;
           }
 
           this.draw();
@@ -130,13 +173,12 @@ export default function Snowfall() {
         this.draw = () => {
           if (!c) return;
 
-          c.font = `${this.radius * 10}px Arial`
-          c.fillStyle = this.color
+          c.font = `${this.radius * 10}px Arial`;
+          c.fillStyle = this.color;
           c.shadowColor = this.shadowColor;
           c.shadowBlur = this.shadowBlur;
           c.fillText(this.letter, this.x, this.y);
-
-        }
+        };
       }
 
       // Implementation
@@ -157,7 +199,7 @@ export default function Snowfall() {
               Math.random() * 80,
               attributes.fallingSpeed,
               randomLetter(attributes.letters)
-            ),
+            )
           );
         }
       };
@@ -178,8 +220,8 @@ export default function Snowfall() {
     }
 
     return () => {
-      removeEventListener('mousemove', () => { });
-      removeEventListener('resize', () => { });
+      removeEventListener('mousemove', () => {});
+      removeEventListener('resize', () => {});
     };
   }, []);
 

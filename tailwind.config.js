@@ -15,14 +15,15 @@ export default {
         base: '14px',
       },
       boxShadow: {
-        light: '5px 4px 0px 0px #000',
-        dark: '5px 4px 0px 0px #000',
+        light: '3px 3px 0px 0px #fc6',
+        dark: '5px 5px 0px 0px #fff',
+        box: '3px 3px 0px 0px #fff',
       },
       translate: {
-        boxShadowX: '5px',
-        boxShadowY: '4px',
-        reverseBoxShadowX: '-5px',
-        reverseBoxShadowY: '-4px',
+        boxShadowX: '3px',
+        boxShadowY: '3px',
+        reverseBoxShadowX: '-3px',
+        reverseBoxShadowY: '-3px',
       },
       fontWeight: {
         base: '500',

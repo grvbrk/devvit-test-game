@@ -1,40 +1,40 @@
-import { h1 } from "motion/react-client"
-import { isVowel } from "../utils"
-import NeoButton from "./ui/neo-button"
-
+import { QuestionType } from '../questions';
+import { isVowel } from '../utils';
+import { Card } from './ui/card';
 
 type QuizCardType = {
-  answer: string
-}
+  question: QuestionType;
+};
 
-export default function QuizCard({ answer }: QuizCardType) {
-  const letters = answer.split("")
+export default function QuizCard({ question }: QuizCardType) {
+  const letters = question.answer.split('');
   return (
-
-    <>
+    <Card>
       <div className="flex gap-2">
-
         {letters.map((letter, idx) => {
-          return <AlphabetSlot key={letter + idx} letter={letter} />
+          return <AlphabetSlot key={letter + idx} letter={letter} />;
         })}
       </div>
-    </>
-  )
+    </Card>
+  );
 }
 function AlphabetSlot({ letter }: { letter: string }) {
-  const vowel = isVowel(letter)
-  const space = letter == " "
+  const vowel = isVowel(letter);
+  const space = letter == ' ';
 
   return (
     <>
-      {space ? <div className="w-5" /> : vowel ? <NeoButton className={`
-              w-14 h-14 rounded-xl font-semibold text-xl
-              transition-all duration-200
-            `}>{letter}</NeoButton > : <NeoButton className={`
-              w-14 h-14  rounded-xl font-semibold text-lg
-              transition-all duration-200
-            `}></NeoButton>}
+      <div className="text-white">
+        {space ? (
+          <div className="w-5" />
+        ) : vowel ? (
+          <div className="flex h-14 w-14 items-center justify-center border-b-2 border-white text-2xl font-semibold">
+            {letter}
+          </div>
+        ) : (
+          <div className="flex h-14 w-14 items-center justify-center border-b-2 border-white text-2xl font-semibold"></div>
+        )}
+      </div>
     </>
-  )
+  );
 }
-

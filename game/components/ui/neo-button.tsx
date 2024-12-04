@@ -1,27 +1,24 @@
-'use client'
+'use client';
 
-import { ClassValue } from 'clsx'
-import { cn } from '../../utils'
+import { cn } from '../../utils';
 
-
-type Props = {
-  className?: ClassValue
-  children?: React.ReactNode
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
 }
 
-export default function NeoButton({ className, children, onClick }: Props) {
+export default function NeoButton({ className, children, onClick, ...props }: ButtonProps) {
   return (
     <button
       role="button"
       aria-label="Click to perform an action"
       onClick={onClick}
       className={cn(
-        'flex cursor-pointer items-center justify-center rounded-base border-2 border-white dark:box-border bg-main text-sm font-base shadow-light dark:shadow-dark transition-all  ',
-        className,
+        'flex cursor-pointer items-center justify-center rounded-base border border-slate-900 bg-white text-sm font-base shadow-light transition-all dark:shadow-dark',
+        className
       )}
+      {...props}
     >
       {children}
     </button>
-  )
+  );
 }
