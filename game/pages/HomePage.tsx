@@ -14,6 +14,7 @@ export const HomePage = ({ postId }: { postId: string }) => {
   const setPage = useSetPage();
   const { gameSettings, setGameSettings } = useGameSettings();
   const [activeKey, setActiveKey] = useState<boolean>(false);
+  console.log(gameSettings);
 
   return (
     <div

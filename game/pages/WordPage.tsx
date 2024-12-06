@@ -14,13 +14,16 @@ export const WordPage = () => {
   const [question, setQuestion] = useState(
     useMemo(() => generateRandomQuestion(gameSettings.difficulty), [gameSettings.difficulty])
   );
+  console.log(gameSettings);
 
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
   const [lives, setLives] = useState<number>(gameSettings.startingLives);
   const [timeRemaining, setTimeRemaining] = useState<number>(gameSettings.gameTimeInSeconds);
 
   const lastGuessedLetter = guessedLetters[guessedLetters.length - 1] ?? null;
+
   const answerLetters = useMemo(() => question.answer.split(''), [question.answer]);
+
   const uniqueAnswerLetters = useMemo(() => {
     return [
       ...new Set(question.answer.split('').filter((letter) => letter !== ' ' && !isVowel(letter))),
@@ -41,7 +44,9 @@ export const WordPage = () => {
       !answerLetters.includes(lastGuessedLetter) &&
       guessedLetters.includes(lastGuessedLetter)
     ) {
-      setLives((prev) => prev - 1);
+      setLives((prev) => {
+        return prev - 1;
+      });
     }
   }, [lastGuessedLetter, guessedLetters, answerLetters]);
 
@@ -132,6 +137,20 @@ export const WordPage = () => {
             <Button
               className="bg-[#fc6]"
               onClick={() => {
+                setGameSettings((prev) => {
+                  return {
+                    ...prev,
+                    difficulty: gameSettings.difficulty,
+                    timer: gameSettings.timer,
+                    gameTimeInSeconds: gameSettings.gameTimeInSeconds,
+                    timeTakenInSeconds: 0,
+                    isGameOver: false,
+                    // isGameWon: false,
+                    // isGameLost: false,
+                    startingLives: 5,
+                    livesRemaining: 5,
+                  };
+                });
                 setPage('home');
               }}
             >
@@ -141,16 +160,16 @@ export const WordPage = () => {
             <Button
               className="bg-[#fc6]"
               onClick={() => {
-                setGameSettings((prevSettings) => {
+                setGameSettings((prev) => {
                   return {
-                    ...prevSettings,
+                    ...prev,
                     difficulty: gameSettings.difficulty,
                     timer: gameSettings.timer,
-                    gameTimeInSeconds: 10,
+                    gameTimeInSeconds: gameSettings.gameTimeInSeconds,
                     timeTakenInSeconds: 0,
                     isGameOver: false,
-                    isGameWon: false,
-                    isGameLost: false,
+                    // isGameWon: false,
+                    // isGameLost: false,
                     startingLives: 5,
                     livesRemaining: 5,
                   };
@@ -181,12 +200,13 @@ function AlphabetList({
   setGuessedLetters: React.Dispatch<React.SetStateAction<string[]>>;
   answerLetters: string[];
 }) {
+  const { gameSettings } = useGameSettings();
   const [activeKey, setActiveKey] = useState<string | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toUpperCase();
-      if (isVowel(key) || guessedLetters.includes(key)) {
+      if (isVowel(key) || guessedLetters.includes(key) || gameSettings.isGameOver) {
         return;
       }
       if (alphabet.includes(key)) {
@@ -195,6 +215,8 @@ function AlphabetList({
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
+      if (gameSettings.isGameOver) return;
+
       const key = event.key.toUpperCase();
       if (!isVowel(key) && alphabet.includes(key)) {
         setGuessedLetters((prev) => (prev.includes(key) ? prev : [...prev, key]));
@@ -231,9 +253,11 @@ function AlphabetList({
             )}
             disabled={isVowel(letter) || guessedLetters.includes(letter)}
             onMouseDown={() => {
+              if (gameSettings.isGameOver) return;
               setActiveKey(letter);
             }}
             onMouseUp={() => {
+              if (gameSettings.isGameOver) return;
               setGuessedLetters((prev) => {
                 return prev.includes(letter) ? prev : [...prev, letter];
               });

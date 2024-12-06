@@ -6,8 +6,8 @@ type GameSettings = {
   gameTimeInSeconds: number;
   timeTakenInSeconds: number;
   isGameOver: boolean;
-  isGameWon: boolean;
-  isGameLost: boolean;
+  // isGameWon: boolean;
+  // isGameLost: boolean;
   startingLives: number;
   livesRemaining: number;
 };
@@ -26,8 +26,8 @@ export default function GameSettingsProvider({ children }: { children: React.Rea
     gameTimeInSeconds: 60,
     timeTakenInSeconds: 0,
     isGameOver: false,
-    isGameWon: false,
-    isGameLost: false,
+    // isGameWon: false,
+    // isGameLost: false,
     startingLives: 5,
     livesRemaining: 5,
   });
