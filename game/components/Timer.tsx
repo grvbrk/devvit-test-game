@@ -13,17 +13,24 @@ export default function Timer({
   isGameOver: boolean;
 }) {
   useEffect(() => {
-    if (isGameOver || timeRemaining === 0) return;
+    if (isGameOver) {
+      return;
+    }
 
-    const timer = setTimeout(() => {
-      if (timeRemaining === 1) {
-        handleTimeEnd();
-      }
-      setTimeRemaining((prev) => prev - 1);
+    const intervalId = setInterval(() => {
+      setTimeRemaining((prevTime) => {
+        if (prevTime <= 1) {
+          handleTimeEnd();
+          clearInterval(intervalId);
+          return 0;
+        }
+
+        return prevTime - 1;
+      });
     }, 1000);
 
-    return () => clearTimeout(timer);
-  }, [timeRemaining, isGameOver, handleTimeEnd]);
+    return () => clearInterval(intervalId);
+  }, [isGameOver]);
 
   return (
     <Card className={`ml-auto border-none`}>
