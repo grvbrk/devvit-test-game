@@ -1,50 +1,107 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { alphabet, cn, generateRandomQuestion, isVowel } from '../utils';
 import NeoButton from '../components/ui/neo-button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Heart } from 'lucide-react';
+import { Heart, MoveLeft, RotateCcw } from 'lucide-react';
+import { useGameSettings } from '../hooks/useGameConfig';
+import { Button } from '../components/ui/button';
+import { useSetPage } from '../hooks/usePage';
+import Timer from '../components/Timer';
 
 export const WordPage = () => {
-  const [question] = useState(generateRandomQuestion());
+  const { gameSettings, setGameSettings } = useGameSettings();
+  const setPage = useSetPage();
+  const [question, setQuestion] = useState(
+    useMemo(() => generateRandomQuestion(gameSettings.difficulty), [gameSettings.difficulty])
+  );
+
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
-  const [lives, setLives] = useState<number>(5);
-  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [lives, setLives] = useState<number>(gameSettings.startingLives);
+  const [timeRemaining, setTimeRemaining] = useState<number>(gameSettings.gameTimeInSeconds);
 
   const lastGuessedLetter = guessedLetters[guessedLetters.length - 1] ?? null;
-  const answerLetters = question.answer.split('');
+  const answerLetters = useMemo(() => question.answer.split(''), [question.answer]);
+  const uniqueAnswerLetters = useMemo(() => {
+    return [
+      ...new Set(question.answer.split('').filter((letter) => letter !== ' ' && !isVowel(letter))),
+    ];
+  }, [question.answer]);
+
+  let isGameWon = useMemo(
+    () => uniqueAnswerLetters.every((letter) => guessedLetters.includes(letter)),
+    [uniqueAnswerLetters, guessedLetters]
+  );
+
+  let isGameLost = useMemo(() => lives === 0, [lives]);
+  let isGameOver = useMemo(() => isGameLost || isGameWon, [isGameLost, isGameWon]);
 
   useEffect(() => {
-    if (guessedLetters.includes(lastGuessedLetter) && !answerLetters.includes(lastGuessedLetter)) {
+    if (
+      lastGuessedLetter &&
+      !answerLetters.includes(lastGuessedLetter) &&
+      guessedLetters.includes(lastGuessedLetter)
+    ) {
       setLives((prev) => prev - 1);
     }
-  }, [guessedLetters]);
+  }, [lastGuessedLetter, guessedLetters, answerLetters]);
+
+  useEffect(() => {
+    if (isGameOver) {
+      setGameSettings((prevSettings) => ({ ...prevSettings, isGameOver: true }));
+    }
+  }, [isGameOver, setGameSettings]);
+
+  function handleTimeEnd() {
+    setLives(0);
+  }
 
   return (
     <div
-      className="flex h-full flex-col items-center justify-center gap-6 text-slate-900"
+      className="flex h-full flex-col items-center gap-6 py-60 text-slate-900"
       style={{
         backgroundImage: `url("/bg-texture.jpg")`,
       }}
     >
-      <div className="flex w-[550px]">
-        <Card className={`shadow-box h-10 w-fit bg-[#fc6] ${lives > 0 ? 'flex' : 'invisible'}`}>
-          <CardHeader className="px-4 py-2 text-slate-900">
-            <CardTitle className="flex">
-              {Array.from({ length: lives }, () => {
-                return <Heart size={18} fill="red" />;
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 100%)',
+        }}
+      />
+      <div className="flex w-[550px] items-center text-white">
+        <Card className="border-none">
+          <CardHeader className="py-2">
+            <CardTitle className="flex gap-1">
+              {Array.from({ length: gameSettings.startingLives }, (_, index) => {
+                const isFilled = index < lives;
+                return (
+                  <Heart
+                    key={index}
+                    size={22}
+                    fill={isFilled ? 'red' : 'white'}
+                    className="text-black"
+                  />
+                );
               })}
             </CardTitle>
           </CardHeader>
         </Card>
-        <Card
-          className={`shadow-box ml-auto h-10 w-fit bg-[#fc6] ${lives > 0 ? 'flex' : 'invisible'}`}
-        >
-          <CardHeader className="px-4 py-2 text-slate-900">
-            <CardTitle className="flex">Timer:</CardTitle>
+        <Card className={`ml-auto h-full`}>
+          <CardHeader className="px-4">
+            <CardTitle></CardTitle>
           </CardHeader>
         </Card>
+
+        {gameSettings.timer && (
+          <Timer
+            timeRemaining={timeRemaining}
+            setTimeRemaining={setTimeRemaining}
+            isGameOver={isGameOver}
+            handleTimeEnd={handleTimeEnd}
+          />
+        )}
       </div>
-      <Card className="w-[550px] bg-[#fc6] shadow-dark">
+      <Card className="w-[550px] bg-[#fc6]">
         <CardHeader className="flex items-center justify-center p-6 text-slate-900">
           <CardTitle className="text-xl">{question.question}</CardTitle>
         </CardHeader>
@@ -69,6 +126,48 @@ export const WordPage = () => {
           answerLetters={answerLetters}
         />
       </Card>
+      <div>
+        {gameSettings.isGameOver && (
+          <Card className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
+            <Button
+              className="bg-[#fc6]"
+              onClick={() => {
+                setPage('home');
+              }}
+            >
+              <MoveLeft />
+              Return to Main Menu
+            </Button>
+            <Button
+              className="bg-[#fc6]"
+              onClick={() => {
+                setGameSettings((prevSettings) => {
+                  return {
+                    ...prevSettings,
+                    difficulty: gameSettings.difficulty,
+                    timer: gameSettings.timer,
+                    gameTimeInSeconds: 10,
+                    timeTakenInSeconds: 0,
+                    isGameOver: false,
+                    isGameWon: false,
+                    isGameLost: false,
+                    startingLives: 5,
+                    livesRemaining: 5,
+                  };
+                });
+
+                setQuestion(generateRandomQuestion(gameSettings.difficulty));
+                setGuessedLetters([]);
+                setLives(5);
+                setTimeRemaining(gameSettings.gameTimeInSeconds);
+              }}
+            >
+              Play Again!
+              <RotateCcw />
+            </Button>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

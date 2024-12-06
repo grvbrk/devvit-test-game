@@ -2,13 +2,17 @@ import { useSetPage } from '../hooks/usePage';
 import Snowfall from '../components/Snowfall';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Label } from '../components/ui/label';
-import { Card, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardDescription } from '../components/ui/card';
 import NeoButton from '../components/ui/neo-button';
 import { cn } from '../utils';
 import { useState } from 'react';
+import { useGameSettings } from '../hooks/useGameConfig';
+import { Checkbox } from '../components/ui/checkbox';
+import { MoveRight } from 'lucide-react';
 
 export const HomePage = ({ postId }: { postId: string }) => {
   const setPage = useSetPage();
+  const { gameSettings, setGameSettings } = useGameSettings();
   const [activeKey, setActiveKey] = useState<boolean>(false);
 
   return (
@@ -27,37 +31,49 @@ export const HomePage = ({ postId }: { postId: string }) => {
       <Snowfall />
       <h1 className="scroll-m-20 text-5xl font-extrabold tracking-tight lg:text-5xl">Wordsworth</h1>
       <div className="flex w-[300px] items-center justify-center">
-        <Card className="w-fit border-none text-[#fc6] shadow-none">
-          <CardHeader className="px-4 py-2">
-            <CardTitle className="flex">
-              <RadioGroup defaultValue="option-one">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="option-one" id="option-one" className="" />
-                  <Label htmlFor="option-one">Easy</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="option-two" id="option-two" />
-                  <Label htmlFor="option-two">Medium</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="option-three" id="option-three" />
-                  <Label htmlFor="option-three">Hard</Label>
-                </div>
-              </RadioGroup>
-            </CardTitle>
-          </CardHeader>
+        <Card className="flex w-fit flex-col gap-4 border-none px-6 py-4 text-[#fc6] shadow-none">
+          <CardDescription className="text-white">
+            <RadioGroup
+              defaultValue={gameSettings.difficulty}
+              onValueChange={(value: 'easy' | 'medium' | 'hard') =>
+                setGameSettings((prev) => {
+                  return { ...prev, difficulty: value };
+                })
+              }
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="easy" id="option-one" />
+                <Label htmlFor="option-one">Easy</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="medium" id="option-two" />
+                <Label htmlFor="option-two">Medium</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="hard" id="option-three" />
+                <Label htmlFor="option-three">Hard</Label>
+              </div>
+            </RadioGroup>
+          </CardDescription>
         </Card>
-        <Card className="mb-auto w-fit border-none text-[#fc6] shadow-none">
-          <CardHeader className="px-4 py-2">
-            <CardTitle className="flex">
-              <RadioGroup defaultValue="option-one">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="option-one" id="option-one" className="" />
-                  <Label htmlFor="option-one">Timer</Label>
-                </div>
-              </RadioGroup>
-            </CardTitle>
-          </CardHeader>
+        <Card className="flex w-fit flex-col gap-4 border-none px-6 py-4 text-[#fc6] shadow-none">
+          <CardDescription className="flex items-center space-x-2 text-white">
+            <Checkbox
+              id="timer"
+              checked={gameSettings.timer}
+              onCheckedChange={(checked) =>
+                setGameSettings((prev) => {
+                  return { ...prev, timer: !!checked };
+                })
+              }
+            />
+            <Label
+              htmlFor="timer"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Timer
+            </Label>
+          </CardDescription>
         </Card>
       </div>
 
@@ -66,7 +82,7 @@ export const HomePage = ({ postId }: { postId: string }) => {
           setPage('pokemon');
         }}
         className={cn(
-          `shadow-box w-36 rounded-xl bg-[#fc6] text-lg font-semibold text-slate-900 transition-all`,
+          `flex w-36 gap-2 rounded-xl py-2 text-lg font-semibold text-slate-900 shadow-light transition-all hover:bg-[#fc6]`,
           activeKey ? 'translate-x-boxShadowX translate-y-boxShadowY shadow-none' : ''
         )}
         onMouseDown={() => {
@@ -76,7 +92,8 @@ export const HomePage = ({ postId }: { postId: string }) => {
           setActiveKey(false);
         }}
       >
-        Play now
+        Start Game
+        <MoveRight size={20} className="mt-1" />
       </NeoButton>
     </div>
   );

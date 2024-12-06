@@ -2,6 +2,7 @@ import { WebviewToBlockMessage } from "./shared";
 import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { questionsList } from "./questions";
+import { useGameSettings } from "./hooks/useGameConfig";
 
 export const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -19,6 +20,7 @@ export function isVowel(char: string): boolean {
   return VOWELS.has(char.toUpperCase());
 };
 
-export function generateRandomQuestion() {
-  return questionsList[Math.floor(Math.random() * questionsList.length)];
+export function generateRandomQuestion(difficulty: "easy" | "medium" | "hard") {
+  const filteredList = questionsList.filter(q => q.difficulty === difficulty)
+  return filteredList[Math.floor(Math.random() * filteredList.length)];
 }

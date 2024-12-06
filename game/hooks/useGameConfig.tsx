@@ -2,7 +2,14 @@ import { createContext, useContext, useState } from 'react';
 
 type GameSettings = {
   difficulty: 'easy' | 'medium' | 'hard';
-  timeInSeconds: number;
+  timer: boolean;
+  gameTimeInSeconds: number;
+  timeTakenInSeconds: number;
+  isGameOver: boolean;
+  isGameWon: boolean;
+  isGameLost: boolean;
+  startingLives: number;
+  livesRemaining: number;
 };
 
 type GameSettingsContextType = {
@@ -14,8 +21,15 @@ const GameSettingsContext = createContext<GameSettingsContextType | null>(null);
 
 export default function GameSettingsProvider({ children }: { children: React.ReactNode }) {
   const [gameSettings, setGameSettings] = useState<GameSettings>({
+    timer: false,
     difficulty: 'easy',
-    timeInSeconds: 60,
+    gameTimeInSeconds: 60,
+    timeTakenInSeconds: 0,
+    isGameOver: false,
+    isGameWon: false,
+    isGameLost: false,
+    startingLives: 5,
+    livesRemaining: 5,
   });
 
   return (
@@ -30,13 +44,5 @@ export const useGameSettings = () => {
   if (context === null) {
     throw new Error('useGameSettings must be used within a GameSettingsProvider');
   }
-  return context.gameSettings;
-};
-
-export const useSetGameSettings = () => {
-  const context = useContext(GameSettingsContext);
-  if (context === null) {
-    throw new Error('useSetGameSettings must be used within a GameSettingsProvider');
-  }
-  return context.setGameSettings;
+  return { gameSettings: context.gameSettings, setGameSettings: context.setGameSettings };
 };

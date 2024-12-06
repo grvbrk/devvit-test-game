@@ -1,27 +1,35 @@
 export type QuestionType = {
   question: string,
   answer: string
+  difficulty: "easy" | "medium" | "hard"
 }
 
 export const questionsList: QuestionType[] = [
   {
     question: "Which country is known as the Land of Rising Sun?",
-    answer: "NEW JAPAN"
+    answer: "JAPAN",
+    difficulty: "easy"
   },
-  // {
-  //   question: "Which country has the Taj Mahal?",
-  //   answer: "INDIA"
-  // },
-  // {
-  //   question: "Which country is home to the kangaroo?",
-  //   answer: "AUSTRALIA"
-  // },
-  // {
-  //   question: "Which country is known for the Great Wall?",
-  //   answer: "CHINA"
-  // },
-  // {
-  //   question: "Which country has the Eiffel Tower?",
-  //   answer: "FRANCE"
-  // }
+  {
+    question: "Which country has the Taj Mahal?",
+    answer: "INDIA",
+    difficulty: "medium"
+  },
+  {
+    question: "Which country is home to the kangaroo?",
+    answer: "AUSTRALIA",
+    difficulty: "medium"
+  },
+  {
+    question: "Which country is known for the Great Wall?",
+    answer: "CHINA",
+    difficulty: "medium"
+
+  },
+  {
+    question: "Which country has the Eiffel Tower?",
+    answer: "FRANCE",
+    difficulty: "hard"
+
+  }
 ]
