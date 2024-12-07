@@ -7,6 +7,8 @@ import { useGameSettings } from '../hooks/useGameConfig';
 import { Button } from '../components/ui/button';
 import { useSetPage } from '../hooks/usePage';
 import Timer from '../components/Timer';
+import Confetti from 'react-confetti';
+import Snowfall from '../components/Snowfall';
 
 export const WordPage = () => {
   const { gameSettings, setGameSettings } = useGameSettings();
@@ -14,7 +16,6 @@ export const WordPage = () => {
   const [question, setQuestion] = useState(
     useMemo(() => generateRandomQuestion(gameSettings.difficulty), [gameSettings.difficulty])
   );
-  console.log(gameSettings);
 
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
   const [lives, setLives] = useState<number>(gameSettings.startingLives);
@@ -62,7 +63,7 @@ export const WordPage = () => {
 
   return (
     <div
-      className="flex h-full flex-col items-center gap-6 py-60 text-slate-900"
+      className="flex h-full flex-col items-center gap-6 py-10 text-slate-900"
       style={{
         backgroundImage: `url("/bg-texture.jpg")`,
       }}
@@ -91,9 +92,16 @@ export const WordPage = () => {
             </CardTitle>
           </CardHeader>
         </Card>
-        <Card className={`ml-auto h-full`}>
+        <Card className={`ml-auto h-full border-none`}>
           <CardHeader className="px-4">
-            <CardTitle></CardTitle>
+            <CardTitle>
+              {isGameWon && (
+                <>
+                  {/* <Snowfall /> */}
+                  <Confetti recycle={false} />
+                </>
+              )}
+            </CardTitle>
           </CardHeader>
         </Card>
 
@@ -205,6 +213,7 @@ function AlphabetList({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      console.log('Clicked');
       const key = event.key.toUpperCase();
       if (isVowel(key) || guessedLetters.includes(key) || gameSettings.isGameOver) {
         return;

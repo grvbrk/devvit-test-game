@@ -2,7 +2,6 @@ import { WebviewToBlockMessage } from "./shared";
 import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { questionsList } from "./questions";
-import { useGameSettings } from "./hooks/useGameConfig";
 
 export const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 

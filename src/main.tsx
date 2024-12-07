@@ -1,4 +1,4 @@
-import { Devvit, useAsync, useState } from '@devvit/public-api';
+import { Devvit, useAsync, useChannel, useState } from '@devvit/public-api';
 import { DEVVIT_SETTINGS_KEYS } from './constants.js';
 import { sendMessageToWebview } from './utils/utils.js';
 import { WebviewToBlockMessage } from '../game/shared.js';
@@ -6,16 +6,21 @@ import { WEBVIEW_ID } from './constants.js';
 import { Preview } from './components/Preview.js';
 import { getPokemonByName } from './core/pokeapi.js';
 
-Devvit.addSettings([
-  // Just here as an example
-  {
-    name: DEVVIT_SETTINGS_KEYS.SECRET_API_KEY,
-    label: 'API Key for secret things',
-    type: 'string',
-    isSecret: true,
-    scope: 'app',
-  },
-]);
+// Devvit.addSettings([
+//   // Just here as an example
+//   {
+//     name: DEVVIT_SETTINGS_KEYS.SECRET_API_KEY,
+//     label: 'API Key for secret things',
+//     type: 'string',
+//     isSecret: true,
+//     scope: 'app',
+//   },
+// ]);
+
+type RealtimeMessage = {
+  user: string;
+  data: any;
+};
 
 Devvit.configure({
   redditAPI: true,
@@ -49,6 +54,21 @@ Devvit.addCustomPostType({
   height: 'tall',
   render: (context) => {
     const [launched, setLaunched] = useState(false);
+
+    const channel = useChannel<RealtimeMessage>({
+      name: 'events',
+      onMessage: (data) => {
+        // modify local state
+      },
+      onSubscribed: () => {
+        // handle connection setup
+      },
+      onUnsubscribed: () => {
+        // handle network degradation with fallback scenarios
+      },
+    });
+
+    channel.subscribe();
 
     return (
       <vstack height="100%" width="100%" alignment="center middle">
@@ -86,9 +106,17 @@ Devvit.addCustomPostType({
                     },
                   });
                   break;
+                case 'GAME_CONFIG_REQUEST':
+                  sendMessageToWebview(context, {
+                    type: 'GAME_CONFIG_RESPONSE',
+                    payload: {
+                      data,
+                    },
+                  });
+                  break;
 
                 default:
-                  console.error('Unknown message type', data satisfies never);
+                  console.error('Unknown message type', data);
                   break;
               }
             }}

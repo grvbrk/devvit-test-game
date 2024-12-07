@@ -226,7 +226,7 @@ export default function Snowfall() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed left-0 top-0 z-0 h-full w-full motion-reduce:hidden">
+    <div className="pointer-events-none fixed left-0 top-0 -z-0 h-full w-full motion-reduce:hidden">
       <canvas ref={canvasRef} className="h-full w-full" />
     </div>
   );

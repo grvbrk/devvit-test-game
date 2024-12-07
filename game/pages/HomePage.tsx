@@ -4,17 +4,19 @@ import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Label } from '../components/ui/label';
 import { Card, CardDescription } from '../components/ui/card';
 import NeoButton from '../components/ui/neo-button';
-import { cn } from '../utils';
+import { cn, sendToDevvit } from '../utils';
 import { useState } from 'react';
 import { useGameSettings } from '../hooks/useGameConfig';
 import { Checkbox } from '../components/ui/checkbox';
 import { MoveRight } from 'lucide-react';
+import { useDevvitListener } from '../hooks/useDevvitListener';
 
 export const HomePage = ({ postId }: { postId: string }) => {
   const setPage = useSetPage();
   const { gameSettings, setGameSettings } = useGameSettings();
   const [activeKey, setActiveKey] = useState<boolean>(false);
-  console.log(gameSettings);
+  const data = useDevvitListener('GAME_CONFIG_RESPONSE');
+  console.log('data', data);
 
   return (
     <div
@@ -31,7 +33,7 @@ export const HomePage = ({ postId }: { postId: string }) => {
       />
       <Snowfall />
       <h1 className="scroll-m-20 text-5xl font-extrabold tracking-tight lg:text-5xl">Wordsworth</h1>
-      <div className="flex w-[300px] items-center justify-center">
+      <div className="flex w-[400px] items-center justify-center">
         <Card className="flex w-fit flex-col gap-4 border-none px-6 py-4 text-[#fc6] shadow-none">
           <CardDescription className="text-white">
             <RadioGroup
@@ -76,12 +78,31 @@ export const HomePage = ({ postId }: { postId: string }) => {
             </Label>
           </CardDescription>
         </Card>
+        <Card className="flex w-fit flex-col gap-4 border-none px-6 py-4 text-[#fc6] shadow-none">
+          <CardDescription className="text-white">
+            <RadioGroup
+              defaultValue={gameSettings.mode}
+              onValueChange={(value: 'singleplayer' | 'multiplayer') =>
+                setGameSettings((prev) => {
+                  return { ...prev, mode: value };
+                })
+              }
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="singleplayer" id="option-one" />
+                <Label htmlFor="option-one">Single Player</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="multiplayer" id="option-two" />
+                <Label htmlFor="option-two">Multi Player</Label>
+              </div>
+            </RadioGroup>
+          </CardDescription>
+        </Card>
       </div>
 
+      {/* Start game button */}
       <NeoButton
-        onClick={() => {
-          setPage('pokemon');
-        }}
         className={cn(
           `flex w-36 gap-2 rounded-xl py-2 text-lg font-semibold text-slate-900 shadow-light transition-all hover:bg-[#fc6]`,
           activeKey ? 'translate-x-boxShadowX translate-y-boxShadowY shadow-none' : ''
@@ -91,6 +112,11 @@ export const HomePage = ({ postId }: { postId: string }) => {
         }}
         onMouseUp={() => {
           setActiveKey(false);
+          sendToDevvit({
+            type: 'GAME_CONFIG_REQUEST',
+            payload: { gameSettings: gameSettings },
+          });
+          setPage('pokemon');
         }}
       >
         Start Game

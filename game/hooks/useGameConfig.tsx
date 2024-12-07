@@ -10,6 +10,7 @@ type GameSettings = {
   // isGameLost: boolean;
   startingLives: number;
   livesRemaining: number;
+  mode: 'singleplayer' | 'multiplayer';
 };
 
 type GameSettingsContextType = {
@@ -30,6 +31,7 @@ export default function GameSettingsProvider({ children }: { children: React.Rea
     // isGameLost: false,
     startingLives: 5,
     livesRemaining: 5,
+    mode: 'singleplayer',
   });
 
   return (
