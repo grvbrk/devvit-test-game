@@ -1,11 +1,8 @@
 export type Page =
   | "home"
-  | "pokemon";
+  | "game";
 
-export type WebviewToBlockMessage = { type: "INIT" } | {
-  type: "GET_POKEMON_REQUEST";
-  payload: { name: string };
-} | {
+export type WebviewToBlockMessage = { type: string } | {
   type: "GAME_CONFIG_REQUEST"
   payload: any
 }
@@ -14,10 +11,8 @@ export type BlocksToWebviewMessage = {
   type: "INIT_RESPONSE";
   payload: {
     postId: string;
+    users: any
   };
-} | {
-  type: "GET_POKEMON_RESPONSE";
-  payload: { number: number; name: string; error?: string };
 } | {
   type: "GAME_CONFIG_RESPONSE"
   payload: any

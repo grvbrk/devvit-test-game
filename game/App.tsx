@@ -6,11 +6,11 @@ import { useEffect, useState } from 'react';
 import { sendToDevvit } from './utils';
 import { useDevvitListener } from './hooks/useDevvitListener';
 
-const getPage = (page: Page, { postId }: { postId: string }) => {
+const getPage = (page: Page, { postId, users }: { postId: string; users: any }) => {
   switch (page) {
     case 'home':
-      return <HomePage postId={postId} />;
-    case 'pokemon':
+      return <HomePage postId={postId} users={users} />;
+    case 'game':
       return <WordPage />;
     default:
       throw new Error(`Unknown page: ${page satisfies never}`);
@@ -19,8 +19,11 @@ const getPage = (page: Page, { postId }: { postId: string }) => {
 
 export const App = () => {
   const [postId, setPostId] = useState('');
+  const [users, setUsers] = useState({});
   const page = usePage();
   const initData = useDevvitListener('INIT_RESPONSE');
+  console.log('initdata', initData);
+
   useEffect(() => {
     sendToDevvit({ type: 'INIT' });
   }, []);
@@ -28,8 +31,9 @@ export const App = () => {
   useEffect(() => {
     if (initData) {
       setPostId(initData.postId);
+      setUsers(initData.users);
     }
   }, [initData, setPostId]);
 
-  return <div className="h-full">{getPage(page, { postId })}</div>;
+  return <div className="h-full">{getPage(page, { postId, users })}</div>;
 };

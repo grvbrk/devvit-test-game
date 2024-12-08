@@ -63,7 +63,7 @@ export const WordPage = () => {
 
   return (
     <div
-      className="flex h-full flex-col items-center gap-6 py-10 text-slate-900"
+      className="flex h-full flex-col items-center justify-center text-slate-900"
       style={{
         backgroundImage: `url("/bg-texture.jpg")`,
       }}
@@ -74,126 +74,128 @@ export const WordPage = () => {
           background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 100%)',
         }}
       />
-      <div className="flex w-[550px] items-center text-white">
-        <Card className="border-none">
-          <CardHeader className="py-2">
-            <CardTitle className="flex gap-1">
-              {Array.from({ length: gameSettings.startingLives }, (_, index) => {
-                const isFilled = index < lives;
+      <div className="flex h-[550px] flex-col items-center pt-8">
+        <div className="flex w-[550px] items-center text-white">
+          <Card className="border-none">
+            <CardHeader className="py-2">
+              <CardTitle className="flex gap-1">
+                {Array.from({ length: gameSettings.startingLives }, (_, index) => {
+                  const isFilled = index < lives;
+                  return (
+                    <Heart
+                      key={index}
+                      size={22}
+                      fill={isFilled ? 'red' : 'white'}
+                      className="text-black"
+                    />
+                  );
+                })}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Card className={`ml-auto h-full border-none`}>
+            <CardHeader className="px-4">
+              <CardTitle>
+                {isGameWon && (
+                  <>
+                    {/* <Snowfall /> */}
+                    <Confetti recycle={false} />
+                  </>
+                )}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+
+          {gameSettings.timer && (
+            <Timer
+              timeRemaining={timeRemaining}
+              setTimeRemaining={setTimeRemaining}
+              isGameOver={isGameOver}
+              handleTimeEnd={handleTimeEnd}
+            />
+          )}
+        </div>
+        <Card className="w-[550px] bg-[#fc6]">
+          <CardHeader className="flex items-center justify-center p-6 text-slate-900">
+            <CardTitle className="text-xl">{question.question}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-center gap-2 text-2xl text-slate-900">
+              {answerLetters.map((letter, idx) => {
                 return (
-                  <Heart
-                    key={index}
-                    size={22}
-                    fill={isFilled ? 'red' : 'white'}
-                    className="text-black"
+                  <AlphabetSlot
+                    key={letter + idx}
+                    letter={letter}
+                    guessed={guessedLetters.includes(letter)}
                   />
                 );
               })}
-            </CardTitle>
-          </CardHeader>
+            </div>
+          </CardContent>
         </Card>
-        <Card className={`ml-auto h-full border-none`}>
-          <CardHeader className="px-4">
-            <CardTitle>
-              {isGameWon && (
-                <>
-                  {/* <Snowfall /> */}
-                  <Confetti recycle={false} />
-                </>
-              )}
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        {gameSettings.timer && (
-          <Timer
-            timeRemaining={timeRemaining}
-            setTimeRemaining={setTimeRemaining}
-            isGameOver={isGameOver}
-            handleTimeEnd={handleTimeEnd}
+        <Card className="w-[550px] border-none p-4 shadow-none">
+          <AlphabetList
+            setGuessedLetters={setGuessedLetters}
+            guessedLetters={guessedLetters}
+            answerLetters={answerLetters}
           />
-        )}
-      </div>
-      <Card className="w-[550px] bg-[#fc6]">
-        <CardHeader className="flex items-center justify-center p-6 text-slate-900">
-          <CardTitle className="text-xl">{question.question}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center gap-2 text-2xl text-slate-900">
-            {answerLetters.map((letter, idx) => {
-              return (
-                <AlphabetSlot
-                  key={letter + idx}
-                  letter={letter}
-                  guessed={guessedLetters.includes(letter)}
-                />
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-      <Card className="w-[550px] border-none p-4 shadow-none">
-        <AlphabetList
-          setGuessedLetters={setGuessedLetters}
-          guessedLetters={guessedLetters}
-          answerLetters={answerLetters}
-        />
-      </Card>
-      <div>
-        {gameSettings.isGameOver && (
-          <Card className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
-            <Button
-              className="bg-[#fc6]"
-              onClick={() => {
-                setGameSettings((prev) => {
-                  return {
-                    ...prev,
-                    difficulty: gameSettings.difficulty,
-                    timer: gameSettings.timer,
-                    gameTimeInSeconds: gameSettings.gameTimeInSeconds,
-                    timeTakenInSeconds: 0,
-                    isGameOver: false,
-                    // isGameWon: false,
-                    // isGameLost: false,
-                    startingLives: 5,
-                    livesRemaining: 5,
-                  };
-                });
-                setPage('home');
-              }}
-            >
-              <MoveLeft />
-              Return to Main Menu
-            </Button>
-            <Button
-              className="bg-[#fc6]"
-              onClick={() => {
-                setGameSettings((prev) => {
-                  return {
-                    ...prev,
-                    difficulty: gameSettings.difficulty,
-                    timer: gameSettings.timer,
-                    gameTimeInSeconds: gameSettings.gameTimeInSeconds,
-                    timeTakenInSeconds: 0,
-                    isGameOver: false,
-                    // isGameWon: false,
-                    // isGameLost: false,
-                    startingLives: 5,
-                    livesRemaining: 5,
-                  };
-                });
+        </Card>
+        <div>
+          {gameSettings.isGameOver && (
+            <Card className="flex w-[350px] items-center justify-center gap-4 border-none p-4 shadow-none">
+              <Button
+                className="bg-[#fc6]"
+                onClick={() => {
+                  setGameSettings((prev) => {
+                    return {
+                      ...prev,
+                      difficulty: gameSettings.difficulty,
+                      timer: gameSettings.timer,
+                      gameTimeInSeconds: gameSettings.gameTimeInSeconds,
+                      timeTakenInSeconds: 0,
+                      isGameOver: false,
+                      // isGameWon: false,
+                      // isGameLost: false,
+                      startingLives: 5,
+                      livesRemaining: 5,
+                    };
+                  });
+                  setPage('home');
+                }}
+              >
+                <MoveLeft />
+                Return to Main Menu
+              </Button>
+              <Button
+                className="bg-[#fc6]"
+                onClick={() => {
+                  setGameSettings((prev) => {
+                    return {
+                      ...prev,
+                      difficulty: gameSettings.difficulty,
+                      timer: gameSettings.timer,
+                      gameTimeInSeconds: gameSettings.gameTimeInSeconds,
+                      timeTakenInSeconds: 0,
+                      isGameOver: false,
+                      // isGameWon: false,
+                      // isGameLost: false,
+                      startingLives: 5,
+                      livesRemaining: 5,
+                    };
+                  });
 
-                setQuestion(generateRandomQuestion(gameSettings.difficulty));
-                setGuessedLetters([]);
-                setLives(5);
-                setTimeRemaining(gameSettings.gameTimeInSeconds);
-              }}
-            >
-              Play Again!
-              <RotateCcw />
-            </Button>
-          </Card>
-        )}
+                  setQuestion(generateRandomQuestion(gameSettings.difficulty));
+                  setGuessedLetters([]);
+                  setLives(5);
+                  setTimeRemaining(gameSettings.gameTimeInSeconds);
+                }}
+              >
+                Play Again!
+                <RotateCcw />
+              </Button>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -213,7 +215,6 @@ function AlphabetList({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      console.log('Clicked');
       const key = event.key.toUpperCase();
       if (isVowel(key) || guessedLetters.includes(key) || gameSettings.isGameOver) {
         return;
@@ -249,7 +250,7 @@ function AlphabetList({
           <NeoButton
             key={letter}
             className={cn(
-              `h-10 w-10 rounded-xl text-lg font-semibold text-slate-900`,
+              `h-9 w-9 rounded-xl text-lg font-semibold text-slate-900 shadow-light`,
               isVowel(letter) && 'bg-slate-500 text-white',
               activeKey === letter
                 ? 'translate-x-boxShadowX translate-y-boxShadowY shadow-none'

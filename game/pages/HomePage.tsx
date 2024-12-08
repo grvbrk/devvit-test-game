@@ -11,12 +11,11 @@ import { Checkbox } from '../components/ui/checkbox';
 import { MoveRight } from 'lucide-react';
 import { useDevvitListener } from '../hooks/useDevvitListener';
 
-export const HomePage = ({ postId }: { postId: string }) => {
+export const HomePage = ({ postId, users }: { postId: string; users: any }) => {
   const setPage = useSetPage();
   const { gameSettings, setGameSettings } = useGameSettings();
   const [activeKey, setActiveKey] = useState<boolean>(false);
   const data = useDevvitListener('GAME_CONFIG_RESPONSE');
-  console.log('data', data);
 
   return (
     <div
@@ -33,6 +32,10 @@ export const HomePage = ({ postId }: { postId: string }) => {
       />
       <Snowfall />
       <h1 className="scroll-m-20 text-5xl font-extrabold tracking-tight lg:text-5xl">Wordsworth</h1>
+      <p className="relative z-20 mb-4 mt-2 text-center text-neutral-300">PostId: {postId}</p>
+      <p className="relative z-20 mb-4 mt-2 text-center text-neutral-300">
+        Users: {JSON.stringify(users)}
+      </p>
       <div className="flex w-[400px] items-center justify-center">
         <Card className="flex w-fit flex-col gap-4 border-none px-6 py-4 text-[#fc6] shadow-none">
           <CardDescription className="text-white">
@@ -116,7 +119,7 @@ export const HomePage = ({ postId }: { postId: string }) => {
             type: 'GAME_CONFIG_REQUEST',
             payload: { gameSettings: gameSettings },
           });
-          setPage('pokemon');
+          setPage('game');
         }}
       >
         Start Game
@@ -125,7 +128,3 @@ export const HomePage = ({ postId }: { postId: string }) => {
     </div>
   );
 };
-
-{
-  /* <p className="relative z-20 mb-4 mt-2 text-center text-neutral-300">PostId: {postId}</p> */
-}

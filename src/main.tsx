@@ -1,10 +1,9 @@
 import { Devvit, useAsync, useChannel, useState } from '@devvit/public-api';
-import { DEVVIT_SETTINGS_KEYS } from './constants.js';
 import { sendMessageToWebview } from './utils/utils.js';
 import { WebviewToBlockMessage } from '../game/shared.js';
 import { WEBVIEW_ID } from './constants.js';
 import { Preview } from './components/Preview.js';
-import { getPokemonByName } from './core/pokeapi.js';
+import { channel } from 'diagnostics_channel';
 
 // Devvit.addSettings([
 //   // Just here as an example
@@ -17,11 +16,6 @@ import { getPokemonByName } from './core/pokeapi.js';
 //   },
 // ]);
 
-type RealtimeMessage = {
-  user: string;
-  data: any;
-};
-
 Devvit.configure({
   redditAPI: true,
   http: true,
@@ -29,8 +23,29 @@ Devvit.configure({
   realtime: true,
 });
 
+type RealTimePlayerUpdates = {
+  sessionId: string;
+  userId: string;
+  name: string;
+  lastSeen: number;
+};
+
+// type UserRecord = {
+//   id: string;
+//   session: string;
+//   name: string;
+// };
+
+function generateId(): string {
+  let id = '';
+  const asciiZero = '0'.charCodeAt(0);
+  for (let i = 0; i < 4; i++) {
+    id += String.fromCharCode(Math.floor(Math.random() * 26) + asciiZero);
+  }
+  return id;
+}
+
 Devvit.addMenuItem({
-  // Please update as you work on your idea!
   label: 'test game 3 post',
   location: 'subreddit',
   forUserType: 'moderator',
@@ -38,7 +53,6 @@ Devvit.addMenuItem({
     const { reddit, ui } = context;
     const subreddit = await reddit.getCurrentSubreddit();
     const post = await reddit.submitPost({
-      // Title of the post. You'll want to update!
       title: 'test game 3 post title',
       subredditName: subreddit.name,
       preview: <Preview />,
@@ -48,20 +62,53 @@ Devvit.addMenuItem({
   },
 });
 
-// Add a post type definition
 Devvit.addCustomPostType({
   name: 'Experience Post',
   height: 'tall',
   render: (context) => {
+    const currentSession = generateId();
     const [launched, setLaunched] = useState(false);
+    const { data: currentUser } = useAsync(async () => {
+      if (!context.userId) return null;
+      const user = await context.reddit.getCurrentUser();
+      if (!user) return null;
+      return { userId: user.id, username: user.username };
+    });
 
-    const channel = useChannel<RealtimeMessage>({
+    const { data: userList, loading } = useAsync(async () => {
+      if (!context.userId) return {};
+      const user = await context.reddit.getCurrentUser();
+      if (user) {
+        channel.send({
+          userId: user.id,
+          name: user.username,
+          lastSeen: Date.now(),
+          sessionId: currentSession,
+        });
+        return { [user.id]: { session: generateId(), name: user.username, lastSeen: Date.now() } };
+      }
+
+      return {};
+    });
+
+    console.log('USERLIST', userList);
+
+    const channel = useChannel<RealTimePlayerUpdates>({
       name: 'events',
-      onMessage: (data) => {
-        // modify local state
+      onMessage: ({ sessionId, userId, name, lastSeen }) => {
+        if (sessionId == currentSession || userId == currentUser?.userId) {
+          return;
+        }
+        if (userList && !(userId in userList)) {
+          userList[userId] = {
+            name,
+            lastSeen,
+            session: sessionId,
+          };
+        }
       },
-      onSubscribed: () => {
-        // handle connection setup
+      onSubscribed: async () => {
+        // await updateUserList();
       },
       onUnsubscribed: () => {
         // handle network degradation with fallback scenarios
@@ -79,40 +126,28 @@ Devvit.addCustomPostType({
             width={'100%'}
             height={'100%'}
             onMessage={async (event) => {
-              console.log('Received message', event);
               const data = event as unknown as WebviewToBlockMessage;
 
               switch (data.type) {
                 case 'INIT':
+                  // const activeUsers = await context.redis.zRange('active_users', 0, -1);
+
                   sendMessageToWebview(context, {
                     type: 'INIT_RESPONSE',
                     payload: {
                       postId: context.postId!,
+                      users: userList,
                     },
                   });
                   break;
-                case 'GET_POKEMON_REQUEST':
-                  context.ui.showToast({ text: `Received message: ${JSON.stringify(data)}` });
-                  const pokemon = await getPokemonByName(data.payload.name);
+                case 'USER_OFFLINE':
+                  const userId = context.userId;
+                  if (!userId || !userList) return;
+                  // if (userId) {
+                  //   await context.redis.zRem('active_users', userId); // Remove user from active list
+                  // }
 
-                  sendMessageToWebview(context, {
-                    type: 'GET_POKEMON_RESPONSE',
-                    payload: {
-                      name: pokemon.name,
-                      number: pokemon.id,
-                      // Note that we don't allow outside images on Reddit if
-                      // wanted to get the sprite. Please reach out to support
-                      // if you need this for your app!
-                    },
-                  });
-                  break;
-                case 'GAME_CONFIG_REQUEST':
-                  sendMessageToWebview(context, {
-                    type: 'GAME_CONFIG_RESPONSE',
-                    payload: {
-                      data,
-                    },
-                  });
+                  if (userId in userList) delete userList[userId];
                   break;
 
                 default:

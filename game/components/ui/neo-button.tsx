@@ -13,7 +13,7 @@ export default function NeoButton({ className, children, onClick, ...props }: Bu
       aria-label="Click to perform an action"
       onClick={onClick}
       className={cn(
-        'flex cursor-pointer items-center justify-center rounded-base border border-slate-900 bg-white text-sm font-base shadow-light transition-all dark:shadow-dark',
+        'flex cursor-pointer items-center justify-center rounded-base border border-slate-900 bg-white text-sm font-base transition-all dark:shadow-dark',
         className
       )}
       {...props}
