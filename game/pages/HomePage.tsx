@@ -11,7 +11,15 @@ import { Checkbox } from '../components/ui/checkbox';
 import { MoveRight } from 'lucide-react';
 import { useDevvitListener } from '../hooks/useDevvitListener';
 
-export const HomePage = ({ postId, users }: { postId: string; users: any }) => {
+export const HomePage = ({
+  postId,
+  users,
+  currentUser,
+}: {
+  postId: string;
+  users: any;
+  currentUser: any;
+}) => {
   const setPage = useSetPage();
   const { gameSettings, setGameSettings } = useGameSettings();
   const [activeKey, setActiveKey] = useState<boolean>(false);
@@ -33,6 +41,9 @@ export const HomePage = ({ postId, users }: { postId: string; users: any }) => {
       <Snowfall />
       <h1 className="scroll-m-20 text-5xl font-extrabold tracking-tight lg:text-5xl">Wordsworth</h1>
       <p className="relative z-20 mb-4 mt-2 text-center text-neutral-300">PostId: {postId}</p>
+      <p className="relative z-20 mb-4 mt-2 text-center text-neutral-300">
+        Current User: {JSON.stringify(currentUser)}
+      </p>
       <p className="relative z-20 mb-4 mt-2 text-center text-neutral-300">
         Users: {JSON.stringify(users)}
       </p>
@@ -115,11 +126,16 @@ export const HomePage = ({ postId, users }: { postId: string; users: any }) => {
         }}
         onMouseUp={() => {
           setActiveKey(false);
-          sendToDevvit({
-            type: 'GAME_CONFIG_REQUEST',
-            payload: { gameSettings: gameSettings },
-          });
-          setPage('game');
+          if (gameSettings.mode === 'singleplayer') {
+            setPage('singleplayerGame');
+          }
+          if (gameSettings.mode === 'multiplayer') {
+            setPage('multiplayerGame');
+            sendToDevvit({
+              type: 'GAME_CONFIG_REQUEST',
+              payload: { gameSettings: gameSettings },
+            });
+          }
         }}
       >
         Start Game
