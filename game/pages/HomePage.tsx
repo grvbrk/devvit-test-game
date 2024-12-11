@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useGameSettings } from '../hooks/useGameConfig';
 import { Checkbox } from '../components/ui/checkbox';
 import { MoveRight } from 'lucide-react';
-import { useDevvitListener } from '../hooks/useDevvitListener';
+import { UserRecord } from '../shared';
 
 export const HomePage = ({
   postId,
@@ -17,13 +17,12 @@ export const HomePage = ({
   currentUser,
 }: {
   postId: string;
-  users: any;
-  currentUser: any;
+  users: Record<string, UserRecord>;
+  currentUser: UserRecord;
 }) => {
   const setPage = useSetPage();
   const { gameSettings, setGameSettings } = useGameSettings();
   const [activeKey, setActiveKey] = useState<boolean>(false);
-  const data = useDevvitListener('GAME_CONFIG_RESPONSE');
 
   return (
     <div
@@ -130,11 +129,8 @@ export const HomePage = ({
             setPage('singleplayerGame');
           }
           if (gameSettings.mode === 'multiplayer') {
+            sendToDevvit({ type: 'ADD_CURRENT_USER_TO_GAME_CHANNEL' });
             setPage('multiplayerGame');
-            sendToDevvit({
-              type: 'GAME_CONFIG_REQUEST',
-              payload: { gameSettings: gameSettings },
-            });
           }
         }}
       >
